@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tcc/criar_conta.dart';
+import 'package:tcc/usuario/homePageUser.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,6 +25,13 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Login realizado com sucesso!'),
+
+        ),
+
+      );
+      Navigator.push(context,
+        MaterialPageRoute(
+          builder: (context) => const HomePageUser(),
         ),
       );
 
@@ -142,8 +150,8 @@ class _LoginPageState extends State<LoginPage> {
                     child: const Text(
                       'Entrar',
                       style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
+                          fontSize: 16,
+                          color: Colors.white,
                       ),
                     ),
                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tcc/usuario/login.dart';
 
 
 class RegisterPage extends StatefulWidget {
@@ -28,6 +29,17 @@ class _RegisterPageState extends State<RegisterPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Cadastro validado com sucesso')),
       );
+      if(_emailController.text.isEmpty || _senhaController.text.isEmpty){
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Preencha todos os campos')),
+        );
+      }else{
+        try{
+
+        }catch (err){
+
+        }
+      }
 
       setState(() => _carregando = false);
       Navigator.pop(context);
@@ -37,6 +49,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Cadastro'),
         centerTitle: true,
@@ -110,8 +123,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     if (value == null || value.isEmpty) {
                       return 'Informe a senha';
                     }
-                    if (value.length < 6) {
-                      return 'Senha mínima de 6 caracteres';
+                    if (value.length < 8) {
+                      return 'Senha mínima de 8 caracteres';
                     }
                     return null;
                   },
@@ -144,13 +157,35 @@ class _RegisterPageState extends State<RegisterPage> {
                 SizedBox(
                   height: 48,
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+
                     onPressed: _carregando ? null : _cadastrarUsuario,
                     child: _carregando
                         ? const CircularProgressIndicator(
                       color: Colors.white,
                     )
-                        : const Text('Cadastrar'),
+                        : const Text('Cadastrar', style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),),
+
                   ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('Já possuo o Cadastro'),
                 ),
               ],
             ),
