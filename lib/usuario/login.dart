@@ -56,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 80),
 
                 const Text(
-                  'Serviços Técnicos\nem Informativa',
+                  'Serviços Técnicos em Informátiva',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 26,
@@ -68,10 +68,10 @@ class _LoginPageState extends State<LoginPage> {
                 const Center(
                   child: CircleAvatar(
                     radius: 40,
-                    backgroundColor: Colors.grey, // ou use Colors.grey[200] para algo mais suave
+                    backgroundColor: Colors.white, // ou use Colors.grey[200] para algo mais suave
                     child: Icon(
                       Icons.person,
-                      size: 50,
+                      size: 100,
                       color: Colors.black, // ou Colors.grey se o fundo for claro
                     ),
                   ),

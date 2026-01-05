@@ -63,13 +63,35 @@ class _RegisterPageState extends State<RegisterPage> {
               children: [
                 const SizedBox(height: 24),
                 const Text(
-                  'Serviços Técnicos\nem Informativa',
+                  'Serviços Técnicos em Informátiva',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                const SizedBox(height: 32),
+
+                const Text(
+                  'Criar uma conta',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                const Text(
+                  'Insira seu e-mail para se cadastrar neste aplicativo',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+
+                const SizedBox(height: 32),
 
                 // Nome
                 TextFormField(
@@ -169,7 +191,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ? const CircularProgressIndicator(
                       color: Colors.white,
                     )
-                        : const Text('Cadastrar', style: TextStyle(
+                        : const Text('Criar Conta', style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
                     ),),
