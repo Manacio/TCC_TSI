@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tcc/criar_conta.dart';
 import 'package:tcc/usuario/homePageUser.dart';
+import '../utils/animacao.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,8 +20,8 @@ class _LoginPageState extends State<LoginPage> {
   void _realizarLogin() {
     if (_formKey.currentState!.validate()) {
       // Se passar por todas as validações
-      final email = _emailController.text;
-      final senha = _senhaController.text;
+      final email = _emailController.text.trim();
+      final senha = _senhaController.text.trim();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -29,13 +30,12 @@ class _LoginPageState extends State<LoginPage> {
         ),
 
       );
-      Navigator.push(context,
-        MaterialPageRoute(
-          builder: (context) => const HomePageUser(),
-        ),
+      Navigator.push(
+        context,
+        FadePageRoute(page: const HomePageUser()),
       );
 
-      // Aqui você pode chamar API, Firebase, etc.
+
       debugPrint('Email: $email');
       debugPrint('Senha: $senha');
     }
@@ -63,8 +63,21 @@ class _LoginPageState extends State<LoginPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                const SizedBox(height: 32),
 
-                const SizedBox(height: 80),
+                const Center(
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Colors.grey, // ou use Colors.grey[200] para algo mais suave
+                    child: Icon(
+                      Icons.person,
+                      size: 50,
+                      color: Colors.black, // ou Colors.grey se o fundo for claro
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 32),
 
                 const Text(
                   'Realizar Login no Aplicativo',
