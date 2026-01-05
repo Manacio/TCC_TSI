@@ -56,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 80),
 
                 const Text(
-                  'Serviços Técnicos em Informátiva',
+                  'Serviços Técnicos em Informática',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 26,

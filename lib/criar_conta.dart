@@ -63,7 +63,7 @@ class _RegisterPageState extends State<RegisterPage> {
               children: [
                 const SizedBox(height: 24),
                 const Text(
-                  'Serviços Técnicos em Informátiva',
+                  'Serviços Técnicos em Informática',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 26,

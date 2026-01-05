@@ -1,109 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:tcc/usuario/login.dart';
-import 'package:tcc/usuario/notificacaoUser.dart';
-import 'package:tcc/usuario/perfilUser.dart';
 import 'package:tcc/criar_conta.dart';
+import 'package:tcc/usuario/perfilUser.dart';
+import 'package:tcc/usuario/homePageUser.dart';
 import '../utils/animacao.dart';
 
-
-class HomePageUser extends StatefulWidget {
-  const HomePageUser({super.key});
+class NotificacaoUser extends StatefulWidget {
+  const NotificacaoUser({super.key});
 
   @override
-  State<HomePageUser> createState() => _HomePageUserState();
+  State<NotificacaoUser> createState() => _NotificacaoUserState();
 }
 
-class _HomePageUserState extends State<HomePageUser> {
-
+class _NotificacaoUserState extends State<NotificacaoUser> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-
-      // AppBar
+      backgroundColor: const Color(0xFFF2F2F2),
       appBar: AppBar(
         title: const Text(
-          'Home',
+          'Notificações',
           style: TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        centerTitle: false,
       ),
-
-      // Corpo
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(16),
         child: Column(
-          children: [
-            //const SizedBox(height: 35),
-
-            const Text(
-              'Fornecedores de Serviços Técnicos em Informática:',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-              ),
+          children: const [
+            NotificationCard(
+              imageUrl: 'https://avatars.githubusercontent.com/u/55263575?v=4&size=64',
+              name: 'Manacio Pereira',
+              status: 'Serviço Confirmado!',
+              statusColor: Colors.green,
             ),
-
-            const SizedBox(height: 16),
-
-            // Lista
-            Expanded(
-              child: ListView(
-                children: const [
-                  ServiceCard(
-                    imageUrl: 'https://i.pravatar.cc/150?img=47',
-                    name: 'Maria Fulana',
-                    address:
-                    'Rua João Maria, 123, Centro, João ...',
-                    service: 'Manutenção, Formatação ..',
-                  ),
-                  ServiceCard(
-                    imageUrl: 'https://avatars.githubusercontent.com/u/55263575?v=4&size=64',
-                    name: 'Manacio Pereira',
-                    address:
-                    'Rua das Flores, 456, Bairro Jardim ..',
-                    service: 'Aplicativo, Reparo...',
-
-                  ),
-                  ServiceCard(
-                    imageUrl: 'https://i.pravatar.cc/150?img=11',
-                    name: 'João Maria',
-                    address:
-                    'Rua Linux, 321, Centro, Jardim ..',
-                    service: 'Software, Formatação Tec...',
-
-                  ),
-                ],
-              ),
+            NotificationCard(
+              imageUrl: 'https://i.pravatar.cc/150?img=47',
+              name: 'Maria Fulana',
+              status: 'Serviço Confirmado!',
+              statusColor: Colors.green,
+            ),
+            NotificationCard(
+              imageUrl: 'https://i.pravatar.cc/150?img=47',
+              name: 'Maria Fulana',
+              status: 'Serviço Cancelado!',
+              statusColor: Colors.red,
             ),
           ],
         ),
       ),
-
-      // Bottom Navigation
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
-        currentIndex: 0,
+        currentIndex: 1, // Mudei para 1, pois estamos na tela de Notificações
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.black,
         onTap: (index) {
-          if (index == 1) {
+          if (index == 0) {
             Navigator.push(
               context,
-              FadePageRoute(
-                page: const NotificacaoUser(),
-              ),
+              FadePageRoute(page: const HomePageUser()),
             );
-          } else if (index == 2) {
+          }  else if (index == 2) {
             Navigator.push(
               context,
               FadePageRoute(page: const PerfilUser()),
             );
           }
         },
+
         items: [
           const BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -113,10 +78,10 @@ class _HomePageUserState extends State<HomePageUser> {
             icon: Stack(
               children: [
                 const Icon(Icons.notifications_none),
-                // aqui vou criar uma condicao para exibir o badge somente se houver notificações
                 Positioned(
                   right: 0,
                   top: 0,
+                  // aqui vou colocar uma condicao para exibir o badge somente se houver notificações
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: const BoxDecoration(
@@ -150,45 +115,47 @@ class _HomePageUserState extends State<HomePageUser> {
           ),
         ],
       ),
-
-
     );
   }
 }
 
-class ServiceCard extends StatelessWidget {
+// ... Resto da classe NotificationCard permanece igual
+
+class NotificationCard extends StatelessWidget {
   final String imageUrl;
   final String name;
-  final String address;
-  final String service;
+  final String status;
+  final Color statusColor;
 
-  const ServiceCard({
+  const NotificationCard({
     super.key,
     required this.imageUrl,
     required this.name,
-    required this.address,
-    required this.service,
+    required this.status,
+    required this.statusColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(15),
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.blue),
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stack(
-            children: [
-              CircleAvatar(
-                radius: 26,
-                backgroundImage: NetworkImage(imageUrl), //aqui é a imagem do tecnico
-              ),
-            ],
+          CircleAvatar(
+            radius: 22,
+            backgroundImage: NetworkImage(imageUrl),
           ),
 
           const SizedBox(width: 12),
@@ -204,28 +171,31 @@ class ServiceCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  address,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Row(
                   children: [
                     Container(
                       width: 3,
-                      height: 14,
-                      color: Colors.blue,
+                      height: 16,
+                      color: statusColor,
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      service,
-                      style: const TextStyle(fontSize: 13),
+                      status,
+                      style: TextStyle(
+                        color: statusColor,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Ver detalhes',
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -235,3 +205,4 @@ class ServiceCard extends StatelessWidget {
     );
   }
 }
+
