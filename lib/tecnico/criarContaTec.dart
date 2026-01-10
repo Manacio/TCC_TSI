@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:tcc/usuario/login.dart';
+import 'package:tcc/tecnico/loginTec.dart';
 
-
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class RegisterPageTec extends StatefulWidget {
+  const RegisterPageTec({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<RegisterPageTec> createState() => _RegisterPageTecState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageTecState extends State<RegisterPageTec> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _nomeController = TextEditingController();
@@ -200,12 +199,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LoginPage(),
-                      ),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => const LoginPageUser(),
+                    //   ),
+                    // );
                   },
                   child: const Text('Já possuo o Cadastro'),
                 ),

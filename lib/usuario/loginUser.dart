@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:tcc/criar_conta.dart';
+import 'package:tcc/usuario/criarContaUser.dart';
 import 'package:tcc/usuario/homePageUser.dart';
 import '../utils/animacao.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginPageUser extends StatefulWidget {
+  const LoginPageUser({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginPageUser> createState() => _LoginPageUserState();
 }
 
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageUserState extends State<LoginPageUser> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _emailController = TextEditingController();
@@ -63,21 +63,21 @@ class _LoginPageState extends State<LoginPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 32),
+                // const SizedBox(height: 32),
 
                 const Center(
                   child: CircleAvatar(
                     radius: 40,
-                    backgroundColor: Colors.white, // ou use Colors.grey[200] para algo mais suave
+                    backgroundColor: Colors.white,
                     child: Icon(
                       Icons.person,
-                      size: 100,
-                      color: Colors.black, // ou Colors.grey se o fundo for claro
+                      size: 75,
+                      color: Colors.black,
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                // const SizedBox(height: 32),
 
                 const Text(
                   'Realizar Login no Aplicativo',
@@ -174,7 +174,7 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const RegisterPage(),
+                        builder: (context) => const RegisterPageUser(),
                       ),
                     );
                   },
