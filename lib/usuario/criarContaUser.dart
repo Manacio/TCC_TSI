@@ -52,6 +52,8 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
       appBar: AppBar(
         title: const Text('Cadastro'),
         centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
       body: SafeArea(
         child: Padding(

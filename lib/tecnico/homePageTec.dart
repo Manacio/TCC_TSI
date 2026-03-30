@@ -3,6 +3,7 @@ import 'package:tcc/tecnico/criarContaTec.dart';
 import 'package:tcc/tecnico/homePageTec.dart';
 import '../utils/animacao.dart';
 
+
 class HomePageTec extends StatefulWidget {
   const HomePageTec({super.key});
 
@@ -11,13 +12,65 @@ class HomePageTec extends StatefulWidget {
 }
 
 class _HomePageTecState extends State<HomePageTec> {
+  final TextEditingController nomeController = TextEditingController();
+  final TextEditingController descricaoController = TextEditingController();
+  final TextEditingController valorController = TextEditingController();
+
+  final List<Map<String, String>> servicos = [
+    {
+      'nome': 'Formatação',
+      'descricao': 'Formatação e instalação do SO',
+      'valor': '50,00',
+    },
+    {
+      'nome': 'Reparo Técnico',
+      'descricao': 'Reparação do Sistema Operacional',
+      'valor': '50,00',
+    },
+    {
+      'nome': 'Rede',
+      'descricao': 'Instalação de Rede Domestica',
+      'valor': '150,00',
+    },
+    {
+      'nome': 'Currículo',
+      'descricao': 'Criação de Currículo personalizado',
+      'valor': '10,00',
+    },
+    {
+      'nome': 'Montagem de Computador',
+      'descricao': 'Faço a instalação das peças!',
+      'valor': '150,00',
+    },
+  ];
+
+  void salvarServico() {
+    if (nomeController.text.isEmpty ||
+        descricaoController.text.isEmpty ||
+        valorController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha todos os campos')),
+      );
+      return;
+    }
+
+    setState(() {
+      servicos.add({
+        'nome': nomeController.text,
+        'descricao': descricaoController.text,
+        'valor': valorController.text,
+      });
+    });
+
+    nomeController.clear();
+    descricaoController.clear();
+    valorController.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
-      // AppBar
       appBar: AppBar(
         title: const Text(
           'Home',
@@ -27,59 +80,175 @@ class _HomePageTecState extends State<HomePageTec> {
         elevation: 0,
         centerTitle: false,
       ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
 
-      // Corpo
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //const SizedBox(height: 35),
-
-            const Text(
-              'Fornecedores de Serviços Técnicos em Informática:',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
+            const Center(
+              child: Text(
+                'Listagem de Serviços:',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
 
             const SizedBox(height: 16),
 
-            // Lista
-            Expanded(
-              child: ListView(
-                children: const [
-                  ServiceCard(
-                    imageUrl: 'https://i.pravatar.cc/150?img=47',
-                    name: 'Maria Fulana',
-                    address:
-                    'Rua João Maria, 123, Centro, João ...',
-                    service: 'Manutenção, Formatação ..',
+            // LISTA DE SERVIÇOS
+            ...servicos.map((servico) {
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border(
+                    left: BorderSide(
+                      color: Colors.blue,
+                      width: 4,
+                    ),
                   ),
-                  ServiceCard(
-                    imageUrl: 'https://avatars.githubusercontent.com/u/55263575?v=4&size=64',
-                    name: 'Manacio Pereira',
-                    address:
-                    'Rua das Flores, 456, Bairro Jardim ..',
-                    service: 'Aplicativo, Reparo...',
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                servico['nome']!,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                'R\$ ${servico['valor']}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            servico['descricao']!,
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () {},
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () {
+                            setState(() {
+                              servicos.remove(servico);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }),
 
-                  ),
-                  ServiceCard(
-                    imageUrl: 'https://i.pravatar.cc/150?img=11',
-                    name: 'João Maria',
-                    address:
-                    'Rua Linux, 321, Centro, Jardim ..',
-                    service: 'Software, Formatação Tec...',
+            const SizedBox(height: 24),
 
+            const Center(
+              child: Text(
+                'Adicionar ou Editar Serviço:',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            TextField(
+              controller: nomeController,
+              decoration: InputDecoration(
+                labelText: 'Nome:',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            TextField(
+              controller: descricaoController,
+              decoration: InputDecoration(
+                labelText: 'Descrição:',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            TextField(
+              controller: valorController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Valor:',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: salvarServico,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                ],
+                ),
+                child: const Text(
+                  'Salvar',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
               ),
             ),
           ],
         ),
       ),
-
       // Bottom Navigation
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
@@ -153,82 +322,4 @@ class _HomePageTecState extends State<HomePageTec> {
   }
 }
 
-class ServiceCard extends StatelessWidget {
-  final String imageUrl;
-  final String name;
-  final String address;
-  final String service;
 
-  const ServiceCard({
-    super.key,
-    required this.imageUrl,
-    required this.name,
-    required this.address,
-    required this.service,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.blue),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              CircleAvatar(
-                radius: 26,
-                backgroundImage: NetworkImage(imageUrl), //aqui é a imagem do tecnico
-              ),
-            ],
-          ),
-
-          const SizedBox(width: 12),
-
-          // Texto
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  address,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Container(
-                      width: 3,
-                      height: 14,
-                      color: Colors.blue,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      service,
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
