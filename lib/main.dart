@@ -1,143 +1,231 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:tcc/usuario/loginUser.dart';
-import 'package:tcc/tecnico/loginTec.dart';
+import 'usuario/homePageUser.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint('Firebase não configurado: $e');
+  }
+
+  runApp(const AastiApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class AastiApp extends StatelessWidget {
+  const AastiApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: WelcomePage(),
+      home: const TelaInicial(),
     );
   }
 }
 
-class WelcomePage extends StatelessWidget {
-  const WelcomePage({super.key});
+class TelaInicial extends StatelessWidget {
+  const TelaInicial({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF2F6DF6), // Azul do layout
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 40),
+    final tamanho = MediaQuery.of(context).size;
+    final escala = tamanho.shortestSide / 360;
 
-              // Título
-              const Text(
+    return Scaffold(
+      backgroundColor: const Color(0xFF1E1E1E),
+      body: Container(
+        width: tamanho.width,
+        height: tamanho.height,
+        color: const Color(0xFF2D6EFF),
+        child: Stack(
+          children: [
+            Positioned(
+              top: 25 * escala,
+              left: 0,
+              right: 0,
+              child: Text(
                 'AASTI',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
                   color: Colors.white,
+                  fontSize: 29 * escala,
+                  fontWeight: FontWeight.bold,
+                  height: 1,
                 ),
               ),
-
-              const SizedBox(height: 8),
-
-              // Subtítulo
-              const Text(
-                'Aplicativo de Agendamento de Serviços\n'
-                    'Técnico em Informática',
+            ),
+            Positioned(
+              top: 52 * escala,
+              left: 0,
+              right: 0,
+              child: Text(
+                'Aplicativo de Agendamento de Serviços de Tecnologia da Informação',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white70,
+                  color: Colors.white,
+                  fontSize: 7.5 * escala,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
-
-              const SizedBox(height: 80),
-
-              // Seja bem-vindo
-              const Text(
+            ),
+            Positioned(
+              top: 62 * escala,
+              left: 0,
+              right: 0,
+              child: Text(
+                'conduzindo-lhe à praticidade!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 9 * escala,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+            Positioned(
+              top: 164 * escala,
+              left: 0,
+              right: 0,
+              child: Text(
                 'Seja Bem Vindo',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
                   color: Colors.white,
+                  fontSize: 19 * escala,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-
-              const SizedBox(height: 40),
-
-              // Eu Sou
-              const Text(
+            ),
+            Positioned(
+              top: 235 * escala,
+              left: 0,
+              right: 0,
+              child: Text(
                 'Eu Sou',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 18,
                   color: Colors.white,
+                  fontSize: 19 * escala,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-
-              const SizedBox(height: 24),
-
-              // Botão Usuário
-              _buildButton(
-                text: 'Usuário',
+            ),
+            Positioned(
+              top: 275 * escala,
+              left: 24 * escala,
+              right: 24 * escala,
+              height: 51 * escala,
+              child: _BotaoTipo(
+                texto: 'Usuário',
+                escala: escala,
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const LoginPageUser(),
+                      builder: (context) => const HomePageUser(),
                     ),
                   );
                 },
               ),
-
-              const SizedBox(height: 16),
-
-              // Botão Técnico
-              _buildButton(
-                text: 'Técnico',
+            ),
+            Positioned(
+              top: 348 * escala,
+              left: 24 * escala,
+              right: 24 * escala,
+              height: 51 * escala,
+              child: _BotaoTipo(
+                texto: 'Técnico',
+                escala: escala,
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginPageTec(),
-                    ),
-                  );
-                                  },
+                  debugPrint('Técnico selecionado');
+                },
               ),
-            ],
-          ),
+            ),
+            Positioned(
+              bottom: 58 * escala,
+              left: 15 * escala,
+              right: 15 * escala,
+              child: Text(
+                'Ao clicar em continuar, você concorda com os nossos',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 11 * escala,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 41 * escala,
+              left: 15 * escala,
+              right: 15 * escala,
+              child: Text(
+                'Termos de Serviço e com a Política de Privacidade',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 11 * escala,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+}
 
-  // Widget do botão
-  Widget _buildButton({
-    required String text,
-    required VoidCallback onPressed,
-  }) {
-    return SizedBox(
-      height: 50,
-      child: OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Colors.white, width: 1.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+
+// =====================================================================
+// BOTÃO PERSONALIZADO
+// =====================================================================
+
+class _BotaoTipo extends StatelessWidget {
+  final String texto;
+  final double escala;
+  final VoidCallback onPressed;
+
+  const _BotaoTipo({
+    required this.texto,
+    required this.escala,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+
+      child: InkWell(
+        onTap: onPressed,
+
+        borderRadius: BorderRadius.circular(8 * escala),
+
+        child: Container(
+          alignment: Alignment.center,
+
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.white,
+              width: 1 * escala,
+            ),
+
+            borderRadius: BorderRadius.circular(8 * escala),
           ),
-        ),
-        child: Text(
-          text,
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.white,
+
+          child: Text(
+            texto,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 23 * escala,
+              fontWeight: FontWeight.w400,
+            ),
           ),
         ),
       ),

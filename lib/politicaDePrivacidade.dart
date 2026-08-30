@@ -118,16 +118,16 @@ class PrivacyPolicyPage extends StatelessWidget {
                   spacing: 12,
                   runSpacing: 12,
                   children: [
-                    OutlinedButton.icon(
-                      onPressed: () => _openUrl('mailto:suporte@exemplo.com'),
-                      icon: const Icon(Icons.email_outlined),
-                      label: const Text('E-mail'),
-                    ),
-                    OutlinedButton.icon(
-                      onPressed: () => _openUrl('https://www.exemplo.com'),
-                      icon: const Icon(Icons.open_in_new),
-                      label: const Text('Site'),
-                    ),
+                    //OutlinedButton.icon(
+                  //    onPressed: () => _openUrl('mailto:suporte@exemplo.com'),
+                   //   icon: const Icon(Icons.email_outlined),
+                    //  label: const Text('E-mail'),
+                   // ),
+                   // OutlinedButton.icon(
+                     // onPressed: () => _openUrl('https://www.exemplo.com'),
+                     // icon: const Icon(Icons.open_in_new),
+                     // label: const Text('Site'),
+                   // ),
                   ],
                 ),
               ],

@@ -1,10 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:tcc/usuario/loginUser.dart';
-import 'package:tcc/usuario/notificacaoUser.dart';
-import 'package:tcc/usuario/perfilUser.dart';
-import 'package:tcc/usuario/criarContaUser.dart';
-import '../utils/animacao.dart';
-
+import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class HomePageUser extends StatefulWidget {
   const HomePageUser({super.key});
@@ -14,223 +13,647 @@ class HomePageUser extends StatefulWidget {
 }
 
 class _HomePageUserState extends State<HomePageUser> {
+  final TextEditingController _cepController = TextEditingController();
+
+  bool _carregandoLocalizacao = true;
+  String _cep = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _obterLocalizacao();
+  }
+
+  @override
+  void dispose() {
+    _cepController.dispose();
+    super.dispose();
+  }
+
+  // ============================================================
+  // OBTÉM A LOCALIZAÇÃO DO USUÁRIO
+  // ============================================================
+
+  Future<void> _obterLocalizacao() async {
+    try {
+      // Verifica se o serviço de localização está ativo
+      bool servicoAtivo =
+          await Geolocator.isLocationServiceEnabled();
+
+      if (!servicoAtivo) {
+        _mostrarMensagem(
+          'Ative a localização do dispositivo.',
+        );
+
+        setState(() {
+          _carregandoLocalizacao = false;
+        });
+
+        return;
+      }
+
+      // Verifica a permissão
+      LocationPermission permissao =
+          await Geolocator.checkPermission();
+
+      // Solicita permissão caso ainda não tenha sido concedida
+      if (permissao == LocationPermission.denied) {
+        permissao = await Geolocator.requestPermission();
+      }
+
+      // Usuário recusou
+      if (permissao == LocationPermission.denied ||
+          permissao == LocationPermission.deniedForever) {
+        _mostrarMensagem(
+          'Permissão de localização não concedida.',
+        );
+
+        setState(() {
+          _carregandoLocalizacao = false;
+        });
+
+        return;
+      }
+
+      // Obtém latitude e longitude
+      Position posicao =
+          await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
+
+      // Converte latitude/longitude em endereço
+      List<Placemark> locais =
+          await placemarkFromCoordinates(
+        posicao.latitude,
+        posicao.longitude,
+      );
+
+      if (locais.isNotEmpty) {
+        Placemark local = locais.first;
+
+        String? codigoPostal = local.postalCode;
+
+        if (codigoPostal != null &&
+            codigoPostal.isNotEmpty) {
+          
+          codigoPostal = _formatarCep(codigoPostal);
+
+          setState(() {
+            _cep = codigoPostal!;
+            _cepController.text = codigoPostal!;
+            _carregandoLocalizacao = false;
+          });
+        } else {
+          setState(() {
+            _carregandoLocalizacao = false;
+          });
+        }
+      } else {
+        setState(() {
+          _carregandoLocalizacao = false;
+        });
+      }
+    } catch (e) {
+      debugPrint(
+        'Erro ao obter localização: $e',
+      );
+
+      setState(() {
+        _carregandoLocalizacao = false;
+      });
+
+      _mostrarMensagem(
+        'Não foi possível obter sua localização.',
+      );
+    }
+  }
+
+  // ============================================================
+  // FORMATA CEP
+  // ============================================================
+
+  String _formatarCep(String cep) {
+    cep = cep.replaceAll(
+      RegExp(r'[^0-9]'),
+      '',
+    );
+
+    if (cep.length == 8) {
+      return '${cep.substring(0, 5)}-${cep.substring(5)}';
+    }
+
+    return cep;
+  }
+
+  // ============================================================
+  // MENSAGEM
+  // ============================================================
+
+  void _mostrarMensagem(String mensagem) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensagem),
+      ),
+    );
+  }
+
+  // ============================================================
+  // BUSCAR POR CEP
+  // ============================================================
+
+  void _buscarPorCep() {
+    String cep = _cepController.text.trim();
+
+    setState(() {
+      _cep = cep;
+    });
+  }
+
+  // ============================================================
+  // INTERFACE
+  // ============================================================
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
 
-      // AppBar
-      appBar: AppBar(
-        title: const Text(
-          'Home',
-          style: TextStyle(color: Colors.black),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: false,
-      ),
-
-      // Corpo
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+      body: SafeArea(
         child: Column(
-          children: [
-            //const SizedBox(height: 35),
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
 
-            const Text(
-              'Fornecedores de Serviços Técnicos em Informática:',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
+          children: [
+
+            // ==================================================
+            // HOME
+            // ==================================================
+
+            const Padding(
+              padding: EdgeInsets.only(
+                left: 9,
+                top: 7,
+              ),
+
+              child: Text(
+                'Home',
+
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                ),
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 13),
 
-            // Lista
-            Expanded(
-              child: ListView(
-                children: const [
-                  ServiceCard(
-                    imageUrl: 'https://i.pravatar.cc/150?img=47',
-                    name: 'Maria Fulana',
-                    address:
-                    'Rua João Maria, 123, Centro, João ...',
-                    service: 'Manutenção, Formatação ..',
-                  ),
-                  ServiceCard(
-                    imageUrl: 'https://avatars.githubusercontent.com/u/55263575?v=4&size=64',
-                    name: 'Manacio Pereira',
-                    address:
-                    'Rua das Flores, 456, Bairro Jardim ..',
-                    service: 'Aplicativo, Reparo...',
+            // ==================================================
+            // CAMPO CEP
+            // ==================================================
 
-                  ),
-                  ServiceCard(
-                    imageUrl: 'https://i.pravatar.cc/150?img=11',
-                    name: 'João Maria',
-                    address:
-                    'Rua Linux, 321, Centro, Jardim ..',
-                    service: 'Software, Formatação Tec...',
-
-                  ),
-                ],
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 4,
               ),
+
+              child: SizedBox(
+                height: 31,
+
+                child: TextField(
+                  controller: _cepController,
+
+                  keyboardType:
+                      TextInputType.number,
+
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(8),
+                  ],
+
+                  onSubmitted: (_) {
+                    _buscarPorCep();
+                  },
+
+                  decoration: InputDecoration(
+                    hintText:
+                        _carregandoLocalizacao
+                            ? 'Obtendo localização...'
+                            : 'Cep',
+
+                    hintStyle:
+                        const TextStyle(
+                      fontSize: 9,
+                      color: Colors.black54,
+                    ),
+
+                    contentPadding:
+                        const EdgeInsets.symmetric(
+                      horizontal: 13,
+                      vertical: 0,
+                    ),
+
+                    suffixIcon:
+                        IconButton(
+                      icon: const Icon(
+                        Icons.search,
+                        size: 16,
+                      ),
+
+                      onPressed:
+                          _buscarPorCep,
+                    ),
+
+                    filled: true,
+
+                    fillColor:
+                        const Color(0xFFD1DFFF),
+
+                    enabledBorder:
+                        OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(12),
+
+                      borderSide:
+                          const BorderSide(
+                        color: Color(0xFF6390FF),
+                        width: 1,
+                      ),
+                    ),
+
+                    focusedBorder:
+                        OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(12),
+
+                      borderSide:
+                          const BorderSide(
+                        color: Color(0xFF336FFF),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 40),
+
+            // ==================================================
+            // TÍTULO
+            // ==================================================
+
+            const Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 9,
+              ),
+
+              child: Text(
+                'Fornecedores de Serviços Técnicos:',
+
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            // ==================================================
+            // LISTA DE FORNECEDORES
+            // ==================================================
+
+            Expanded(
+              child: _listaFornecedores(),
             ),
           ],
         ),
       ),
-
-      // Bottom Navigation
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        currentIndex: 0,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.black,
-        onTap: (index) {
-          if (index == 1) {
-            Navigator.push(
-              context,
-              FadePageRoute(
-                page: const NotificacaoUser(),
-              ),
-            );
-          } else if (index == 2) {
-            Navigator.push(
-              context,
-              FadePageRoute(page: const PerfilUser()),
-            );
-          }
-        },
-        items: [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Stack(
-              children: [
-                const Icon(Icons.notifications_none),
-                // aqui vou criar uma condicao para exibir o badge somente se houver notificações
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 14,
-                      minHeight: 14,
-                    ),
-                    child: const Text(
-                      '2',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            label: 'Notificações',
-          ),
-          const BottomNavigationBarItem(
-            icon: CircleAvatar(
-              radius: 12,
-              backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=15'),
-            ),
-            label: 'Perfil',
-          ),
-        ],
-      ),
-
-
     );
   }
-}
 
-class ServiceCard extends StatelessWidget {
-  final String imageUrl;
-  final String name;
-  final String address;
-  final String service;
+  // ============================================================
+  // LISTA DO FIREBASE
+  // ============================================================
 
-  const ServiceCard({
-    super.key,
-    required this.imageUrl,
-    required this.name,
-    required this.address,
-    required this.service,
-  });
+  Widget _listaFornecedores() {
+    if (Firebase.apps.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Text(
+            'Firebase não configurado. Adicione o arquivo google-services.json para ativar os fornecedores.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12),
+          ),
+        ),
+      );
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.blue),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              CircleAvatar(
-                radius: 26,
-                backgroundImage: NetworkImage(imageUrl), //aqui é a imagem do tecnico
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('fornecedores')
+          .snapshots(),
+
+      builder: (context, snapshot) {
+
+        // ------------------------------------------------------
+        // CARREGANDO
+        // ------------------------------------------------------
+
+        if (snapshot.connectionState ==
+            ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        // ------------------------------------------------------
+        // ERRO
+        // ------------------------------------------------------
+
+        if (snapshot.hasError) {
+          return const Center(
+            child: Text(
+              'Erro ao carregar fornecedores.',
+              style: TextStyle(
+                fontSize: 12,
               ),
-            ],
+            ),
+          );
+        }
+
+        // ------------------------------------------------------
+        // SEM DADOS
+        // ------------------------------------------------------
+
+        if (!snapshot.hasData ||
+            snapshot.data!.docs.isEmpty) {
+          return const Center(
+            child: Text(
+              'Nenhum fornecedor encontrado.',
+              style: TextStyle(
+                fontSize: 12,
+              ),
+            ),
+          );
+        }
+
+        final fornecedores =
+            snapshot.data!.docs;
+
+        // ------------------------------------------------------
+        // LISTA
+        // ------------------------------------------------------
+
+        return ListView.builder(
+          padding:
+              const EdgeInsets.symmetric(
+            horizontal: 4,
           ),
 
-          const SizedBox(width: 12),
+          itemCount:
+              fornecedores.length,
 
-          // Texto
+          itemBuilder:
+              (context, index) {
+
+            final documento =
+                fornecedores[index];
+
+            final dados =
+                documento.data()
+                    as Map<String, dynamic>;
+
+            return _cardFornecedor(
+              dados,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // ============================================================
+  // CARD DO FORNECEDOR
+  // ============================================================
+
+  Widget _cardFornecedor(
+    Map<String, dynamic> dados,
+  ) {
+
+    final String nome =
+        dados['nome'] ??
+        'Nome não informado';
+
+    final String endereco =
+        dados['endereco'] ??
+        'Endereço não informado';
+
+    final String servicos =
+        dados['servicos'] ??
+        'Serviços não informados';
+
+    final String foto =
+        dados['foto'] ?? '';
+
+    return Container(
+      height: 53,
+
+      margin:
+          const EdgeInsets.only(
+        bottom: 4,
+      ),
+
+      decoration:
+          BoxDecoration(
+        color: Colors.white,
+
+        border:
+            Border.all(
+          color:
+              const Color(0xFF4C80FF),
+          width: 1,
+        ),
+
+        borderRadius:
+            BorderRadius.circular(13),
+      ),
+
+      child: Row(
+        children: [
+
+          // ==================================================
+          // FOTO
+          // ==================================================
+
+          Padding(
+            padding:
+                const EdgeInsets.only(
+              left: 8,
+              right: 7,
+            ),
+
+            child:
+                _fotoFornecedor(foto),
+          ),
+
+          // ==================================================
+          // INFORMAÇÕES
+          // ==================================================
+
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  address,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Container(
-                      width: 3,
-                      height: 14,
-                      color: Colors.blue,
+            child: Padding(
+              padding:
+                  const EdgeInsets.only(
+                top: 6,
+                right: 7,
+              ),
+
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+
+                children: [
+
+                  // NOME
+                  Text(
+                    nome,
+
+                    maxLines: 1,
+
+                    overflow:
+                        TextOverflow.ellipsis,
+
+                    style:
+                        const TextStyle(
+                      fontSize: 9,
+                      fontWeight:
+                          FontWeight.bold,
+                      color: Colors.black,
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      service,
-                      style: const TextStyle(fontSize: 13),
+                  ),
+
+                  const SizedBox(
+                    height: 2,
+                  ),
+
+                  // ENDEREÇO
+                  Text(
+                    endereco,
+
+                    maxLines: 1,
+
+                    overflow:
+                        TextOverflow.ellipsis,
+
+                    style:
+                        const TextStyle(
+                      fontSize: 8,
+                      color: Colors.grey,
                     ),
-                  ],
-                ),
-              ],
+                  ),
+
+                  const SizedBox(
+                    height: 2,
+                  ),
+
+                  // SERVIÇOS
+                  Row(
+                    children: [
+
+                      const Icon(
+                        Icons.build,
+                        size: 9,
+                        color:
+                            Color(0xFF4C80FF),
+                      ),
+
+                      const SizedBox(
+                        width: 3,
+                      ),
+
+                      Expanded(
+                        child: Text(
+                          servicos,
+
+                          maxLines: 1,
+
+                          overflow:
+                              TextOverflow.ellipsis,
+
+                          style:
+                              const TextStyle(
+                            fontSize: 8,
+                            color:
+                                Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // FOTO DO FORNECEDOR
+  // ============================================================
+
+  Widget _fotoFornecedor(
+    String foto,
+  ) {
+
+    if (foto.isNotEmpty) {
+      return ClipOval(
+        child: Image.network(
+          foto,
+
+          width: 36,
+          height: 36,
+
+          fit: BoxFit.cover,
+
+          errorBuilder:
+              (context, error, stackTrace) {
+            return _fotoPadrao();
+          },
+        ),
+      );
+    }
+
+    return _fotoPadrao();
+  }
+
+  // ============================================================
+  // FOTO PADRÃO
+  // ============================================================
+
+  Widget _fotoPadrao() {
+    return Container(
+      width: 36,
+      height: 36,
+
+      decoration:
+          const BoxDecoration(
+        shape: BoxShape.circle,
+        color: Color(0xFFE5E5E5),
+      ),
+
+      child: const Icon(
+        Icons.person,
+        size: 25,
+        color: Colors.grey,
       ),
     );
   }
